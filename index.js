@@ -9,20 +9,30 @@ const { exec } = require("child_process");
 const fs = require("fs");
 const ora = require("ora");
 const chalk = require("chalk");
+const open = require('open');
 
 const templateList = {
-  'react': {
+  react: {
     name: "react",
-    desc: "基于egg+react项目",
+    desc: "基于egg+react通用项目模板",
     downloadUrl: "https://gitee.com:debingfeng/cc-cli-egg-react#master",
     url: "https://gitee.com/debingfeng/cc-cli-egg-react",
+    config: "",
+    tpl: "",
+    
   },
-  'vue': {
+  vue: {
     name: "egg-vue",
-    desc: "基于egg+vue项目",
+    desc: "基于egg+vue通用项目模板",
     downloadUrl: "https://gitee.com:debingfeng/cc-cli-egg-vue#master",
-    url: "https://gitee.com/debingfeng/cc-cli-egg-vue",
+    url: "https://gitee.com/debingfeng/cc-cli-egg-vue"
   },
+  web: {
+    name: "webapp",
+    desc: "基于gulp构建的通用纯webapp模板",
+    downloadUrl: "https://gitee.com:debingfeng/webapp#master",
+    url: "https://gitee.com/debingfeng/webapp"
+  }
 };
 
 program.version("0.0.1");
@@ -34,8 +44,8 @@ program
   .option("-t, --template", "请选择选择模板名称", "react")
   .option("-p, --project", "你的项目名称", `demo${Date.now()}`)
   .action((templateName, projectName) => {
-    console.log('templateName',templateName)
-    console.log('projectName',projectName)
+    console.log("templateName", templateName);
+    console.log("projectName", projectName);
     // 获取用户输入信息
     getUserInput().then((answers) => {
       const { downloadUrl } = templateList[templateName];
@@ -44,7 +54,6 @@ program
 
       downloadGitRep(downloadUrl, projectName, { clone: true }, (err) => {
         if (err) {
-          chalk.red(err);
           spinner.fail("下载失败");
           return;
         }
@@ -62,7 +71,6 @@ program
         spinner.start("安装依赖中");
         exec(cmdStr, (error, stdout, stderr) => {
           if (error) {
-            chalk.red(error);
             return spinner.fail("安装依赖失败");
           }
           spinner.succeed("安装完成");
@@ -80,16 +88,45 @@ program
   .command("list")
   .description("查看模板列表")
   .action(() => {
+    let str = "";
     // 只需要打印模板列表
-    templateList.forEach((item) => {
-      console.log(`${item.name} ${item.desc}`);
+    Object.keys(templateList).forEach((key, index) => {
+      str += "    \n";
+      str += `    ${index + 1}. ${key}: ${templateList[key].desc} \n`;
+      str += "    ";
     });
+
+    console.log(chalk.blueBright(str));
+
+    // 根据参数来创建目录和引入模板
+  });
+
+program
+  .command("ui")
+  .description("可视化项目管理操作")
+  .action(() => {
+    const cmdStr = `yarn ui:dev`;
+    const spinner = ora();
+    spinner.start('启动服务中')
+    // exec(cmdStr, (error, stdout, stderr) => {
+    //   console.log('xxxxxx');
+    //   if (error) {
+    //     return spinner.fail("启动服务失败");
+    //   }
+      
+    //   spinner.success('启动完成')
+    //   console.log(chalk.green('启动成功'))
+    // });
+    open('http://localhost:9102')
 
     // 根据参数来创建目录和引入模板
   });
 
 program.parse(process.argv);
 
+/**
+ * 获取用户输入参数
+ */
 function getUserInput() {
   return new Promise((resolve, reject) => {
     inquirer
@@ -98,7 +135,7 @@ function getUserInput() {
         {
           type: "input",
           name: "name",
-          message: "请输入项目名称",
+          message: "请输入项目名称"
           // default: ''，
           // validate: () => {},
           // filter: () => {}
@@ -106,11 +143,11 @@ function getUserInput() {
         {
           type: "input",
           name: "author",
-          message: "请输入作者名称",
+          message: "请输入作者名称"
           // default: ''，
           // validate: () => {},
           // filter: () => {}
-        },
+        }
       ])
       .then((answers) => {
         // Use user feedback for... whatever!!

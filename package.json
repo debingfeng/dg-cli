@@ -1,10 +1,11 @@
 {
-  "name": "cfe-cli",
+  "name": "dg-cli",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ui:dev": "vuepress dev ui",
+    "ui:build": "vuepress build ui"
   },
   "bin": {
     "cc": "index.js"
@@ -17,6 +18,10 @@
     "download-git-repo": "^3.0.2",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.2",
+    "open": "8.2.1",
     "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "vuepress": "1.8.2"
   }
 }
